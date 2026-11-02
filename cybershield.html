@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CYBERSHIELD AI</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#050B16;--bg2:#0B1525;--card:#101E32;--cy:#21D4FD;--bl:#3478F6;--gr:#25D995;--or:#FFAA42;--rd:#FF4B5C;--tx:#F4F8FF;--mut:#8fa3bf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:'Chakra Petch',system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--card);border:1px solid #23406a;padding:7px 12px;border-radius:4px;cursor:pointer}
+button:hover{border-color:var(--cy)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cy)}
+button.p{background:var(--bl);border-color:var(--bl)}button.d{border-color:var(--rd);color:var(--rd)}
+input,select{background:var(--bg2);border:1px solid #23406a;padding:8px;border-radius:4px;width:100%}
+#auth{position:fixed;inset:0;display:grid;place-items:center;z-index:5;background:radial-gradient(circle at 70% 20%,#0d2547,var(--bg) 60%)}
+#bgc{position:absolute;inset:0}
+.glass{position:relative;width:min(380px,92vw);padding:26px;background:#0b1525cc;backdrop-filter:blur(14px);border:1px solid #21d4fd55;border-radius:8px;box-shadow:0 0 60px #21d4fd22}
+.glass h1{margin:0 0 2px;font-size:28px;letter-spacing:.02em}.glass p{color:var(--mut);margin:0 0 16px}
+.glass label{display:block;margin:10px 0 4px;color:var(--mut);font-size:13px}.glass .row{display:flex;gap:8px;margin-top:14px}
+.err{color:var(--rd);min-height:18px;font-size:13px;margin-top:8px}.note{font-size:12px;color:var(--mut);margin-top:12px}
+#app{display:none;height:100%;grid-template-rows:auto 1fr}
+header{display:flex;align-items:center;gap:14px;padding:8px 14px;background:var(--bg2);border-bottom:1px solid #1b3355;flex-wrap:wrap}
+header b{font-size:18px;color:var(--cy)}header span{color:var(--mut);font-size:13px}
+main{display:grid;grid-template-columns:1fr 400px;min-height:0}
+#view{position:relative;min-height:320px}#view canvas{display:block;width:100%;height:100%}
+#hud{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:90%}
+#hud input,#hud select{width:auto;padding:5px;font-size:13px}
+#legend{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--mut);display:flex;gap:10px;flex-wrap:wrap}
+#legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+aside{background:var(--bg2);border-left:1px solid #1b3355;display:flex;flex-direction:column;min-height:0}
+nav{display:flex;border-bottom:1px solid #1b3355;overflow:auto}
+nav button{border:0;border-radius:0;background:none;color:var(--mut);padding:10px 11px;white-space:nowrap}
+nav button.on{color:var(--cy);box-shadow:inset 0 -2px var(--cy)}
+.pane{padding:12px;overflow:auto;flex:1;display:none}.pane.on{display:block}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kp div{background:var(--card);padding:8px;border-radius:4px;border-left:3px solid var(--bl)}
+.kp b{display:block;font-size:22px}.kp small{color:var(--mut);font-size:11px}
+h3{margin:14px 0 6px;font-size:14px;color:var(--cy)}
+.log{font-size:12px;line-height:1.5;color:#c6d4e8;max-height:190px;overflow:auto;background:var(--bg);padding:8px;border-radius:4px}
+.item{background:var(--card);padding:9px;border-radius:4px;margin-bottom:6px;font-size:13px;border-left:3px solid var(--or)}
+.item .r{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:1px 6px;border-radius:3px;background:#23406a}
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+canvas.ch{width:100%;height:150px;background:var(--bg);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:5px;border-bottom:1px solid #1b3355;text-align:left}
+.tip{font-size:12px;color:var(--mut)}
+@media(max-width:860px){main{grid-template-columns:1fr;grid-template-rows:55vh auto}aside{border-left:0}#app{height:auto;min-height:100%}html,body{height:auto}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<section id="auth"><canvas id="bgc"></canvas>
+<div class="glass"><h1>CYBERSHIELD AI</h1><p>Predict. Protect. Recover.</p>
+<form id="f" onsubmit="return false">
+<div id="regOnly" hidden><label>Full name</label><input id="nm" autocomplete="name"></div>
+<label>Email</label><input id="em" type="email" autocomplete="email">
+<label>Password (8+ characters)</label><input id="pw" type="password" autocomplete="current-password">
+<div id="regOnly2" hidden><label>Confirm password</label><input id="pw2" type="password"></div>
+<label style="display:flex;gap:6px;align-items:center"><input id="sp" type="checkbox" style="width:auto"> Show password</label>
+<div class="err" id="er"></div>
+<div class="row"><button class="p" id="go" style="flex:1">Sign in</button><button id="sw">Create account</button></div>
+<div class="row"><button id="demo" style="flex:1">Enter judge demo</button></div>
+</form>
+<div class="note">Prototype notice: accounts are stored in this browser only (passwords hashed with SHA-256 + salt via Web Crypto). The FastAPI/Argon2/JWT backend in the master prompt is not part of this single-file build.</div></div></section>
+
+<div id="app">
+<header><b>CYBERSHIELD AI</b><span id="who"></span><span style="flex:1"></span><span id="ts">No simulation yet</span><button id="out">Log out</button></header>
+<main>
+<div id="view"><div id="hud"><input id="q" placeholder="Search device ID"><select id="ft"><option value="">All types</option><option>Desktop</option><option>Laptop</option><option>Server</option><option>Database</option><option>Router</option><option>Gateway</option></select><select id="fs"><option value="">All states</option><option value="S">Healthy</option><option value="E">Exposed</option><option value="I">Infected</option><option value="R">Recovered</option><option value="X">Isolated</option></select></div>
+<div id="legend"><span><i style="background:#25D995"></i>Healthy</span><span><i style="background:#FFAA42"></i>Exposed</span><span><i style="background:#FF4B5C"></i>Infected</span><span><i style="background:#21D4FD"></i>Recovered</span><span><i style="background:#777"></i>Isolated</span><span>Drag to rotate, scroll to zoom, click a device</span></div></div>
+<aside><nav id="nav"></nav>
+<div class="pane on" id="p0"><div class="kp" id="kp"></div><h3>Threat status</h3><div id="th" class="tip"></div><h3>Network health over time</h3><canvas class="ch" id="c0"></canvas><h3>Selected device</h3><div id="dv" class="tip">Click a device in the 3D view.</div><h3>Live activity</h3><div class="log" id="lg"></div></div>
+<div class="pane" id="p1"><div class="ctl"><select id="sc"><option value="A">A. Single device infection</option><option value="B">B. Multi-device propagation</option><option value="C">C. Server network threat</option><option value="D">D. Multiple segments at risk</option><option value="E">E. AI defence and recovery</option></select><input id="nd" type="number" min="30" max="100" value="60" title="Virtual devices"><input id="sd" type="number" value="1337" title="Random seed"><select id="sp2"><option value="1200">Speed 0.5x</option><option value="700" selected>Speed 1x</option><option value="300">Speed 2x</option><option value="120">Speed 5x</option></select><button class="p" id="b1">Start</button><button id="b2">Pause / Resume</button><button id="b3">Step once</button><button id="b4">Reset</button></div>
+<p class="tip">Every run is reproducible: same scenario, size and seed give the same events. All devices are virtual and use documentation IP range 192.0.2.0/24 and 198.51.100.0/24.</p><h3>Timeline</h3><input type="range" id="tl" min="0" max="0" value="0"><div class="tip" id="tlt"></div><div class="log" id="ev"></div></div>
+<div class="pane" id="p2"><div class="tip"><b>SEIR stages.</b> Susceptible: healthy but reachable. Exposed: contacted an infected neighbour, not yet spreading. Infected: spreading. Recovered: cleaned and temporarily immune.</div><div class="kp" id="sk"></div><canvas class="ch" id="c1"></canvas><h3>Propagation estimate</h3><div id="rr" class="tip"></div>
+<h3>GNN-style risk (untrained baseline)</h3><div class="tip">Two rounds of neighbour message passing over the device graph with fixed hand-set weights. This is not a trained PyTorch Geometric model. Confidence describes how much graph evidence exists, not whether a device is infected.</div><table id="gt"></table>
+<h3>Defence policy</h3><div class="tip">Rule-based baseline (not a trained RL policy). Reward it would be scored on: +1 per infection avoided, +2 for faster containment, +1 per recovery, -3 per false-positive isolation, -0.5 per isolated healthy device per step.</div></div>
+<div class="pane" id="p3"><h3>Recommendations awaiting human approval</h3><div id="rc"></div><h3>Audit log</h3><table id="au"></table></div>
+<div class="pane" id="p4"><button class="p" id="cmp">Run comparison on current seed</button><p class="tip">Three policies replayed on the same synthetic network, scenario and seed for 45 steps. These are simulation measurements, not real-world benchmarks.</p><table id="ct"></table><button id="csv">Export CSV</button> <button id="pdf">Print report</button><h3>Runs this session</h3><table id="hs"></table></div>
+</aside></main></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const rngf=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const SEGS=['Administration','Computer Lab','Student Network','Server Room','Database Network'];
+const TYPES=['Desktop','Laptop','Server','Database','Router','Gateway'];
+const COL={S:0x25D995,E:0xFFAA42,I:0xFF4B5C,R:0x21D4FD,X:0x777777};
+const NAME={S:'Healthy',E:'Exposed',I:'Infected',R:'Recovered',X:'Isolated'};
+
+function Sim(seed,n,scn){
+  const r=rngf(seed),s={seed,scn,t:0,nodes:[],edges:[],blocked:new Set(),hist:[],log:[],r,beta:.34,sigma:.3,gamma:.07,avoided:0};
+  const centres=SEGS.map((_,i)=>{const a=i/5*Math.PI*2;return[Math.cos(a)*9,(r()-.5)*5,Math.sin(a)*9]});
+  s.nodes.push({id:'GW-000',type:'Gateway',seg:0,ip:'192.0.2.1',pos:[0,0,0],st:'S',nb:[],act:.1});
+  SEGS.forEach((g,i)=>s.nodes.push({id:'RT-'+String(i+1).padStart(3,'0'),type:'Router',seg:i,ip:'192.0.2.'+(10+i),pos:centres[i].slice(),st:'S',nb:[],act:.2}));
+  for(let i=s.nodes.length;i<n;i++){const g=i%5,c=centres[g];let ty=g==3?(r()<.6?'Server':'Desktop'):g==4?(r()<.7?'Database':'Server'):(r()<.45?'Laptop':'Desktop');
+    s.nodes.push({id:ty.slice(0,2).toUpperCase()+'-'+String(i).padStart(3,'0'),type:ty,seg:g,ip:(i%2?'198.51.100.':'192.0.2.')+(20+i),pos:[c[0]+(r()-.5)*7,c[1]+(r()-.5)*6,c[2]+(r()-.5)*7],st:'S',nb:[],act:r()*.5})}
+  const link=(a,b)=>{if(a==b||s.nodes[a].nb.includes(b))return;s.nodes[a].nb.push(b);s.nodes[b].nb.push(a);s.edges.push([a,b])};
+  for(let i=1;i<=5;i++)link(0,i);
+  for(let i=6;i<n;i++){const g=s.nodes[i].seg;link(i,1+g);const same=s.nodes.map((x,j)=>j).filter(j=>j>5&&j!=i&&s.nodes[j].seg==g);if(same.length)link(i,same[Math.floor(r()*same.length)])}
+  for(let k=0;k<Math.floor(n/12);k++)link(6+Math.floor(r()*(n-6)),6+Math.floor(r()*(n-6)));
+  const pick=g=>{const c=s.nodes.map((x,j)=>j).filter(j=>j>5&&(g==null||s.nodes[j].seg==g));return c[Math.floor(r()*c.length)]};
+  const inf=i=>{s.nodes[i].st='I'};
+  if(scn=='A'||scn=='E')inf(pick());else if(scn=='B'){inf(pick());inf(pick());inf(pick())}else if(scn=='C'){inf(pick(3));inf(pick(4))}else{inf(pick(1));inf(pick(2));inf(pick(0))}
+  s.say=m=>{s.log.unshift('t='+s.t+'  '+m);if(s.log.length>200)s.log.pop()};
+  s.say('Scenario '+scn+' generated: '+n+' virtual devices, seed '+seed);
+  s.count=()=>{const c={S:0,E:0,I:0,R:0,X:0};s.nodes.forEach(x=>c[x.st]++);return c};
+  s.score=()=>{ // GNN-style message passing (untrained, fixed weights)
+    const w={I:1,E:.6,S:0,R:.05,X:0},f=s.nodes.map(x=>w[x.st]*.8+x.act*.2);
+    const agg=v=>s.nodes.map(x=>{const nb=x.nb.filter(j=>s.nodes[j].st!='X'&&!s.blocked.has(key(s.nodes.indexOf(x),j)));return nb.length?nb.reduce((a,j)=>a+v[j],0)/nb.length:0});
+    const h1=agg(f),h2=agg(h1);
+    s.nodes.forEach((x,i)=>{const z=-2.4+2.2*f[i]+3.2*h1[i]+1.6*h2[i];x.risk=x.st=='X'?0:1/(1+Math.exp(-z));x.conf=Math.min(.95,.35+.08*x.nb.length+.3*Math.abs(h1[i]-.5));
+      const inb=x.nb.filter(j=>s.nodes[j].st=='I').length;x.why=x.st=='I'?'Confirmed infected in simulation':inb?inb+' infected neighbour(s)':h2[i]>.15?'Two hops from infection':'Low neighbourhood exposure'})};
+  const key=(a,b)=>a<b?a+'-'+b:b+'-'+a;s.key=key;
+  s.step=()=>{s.t++;const next=s.nodes.map(x=>x.st);let ne=0;
+    s.nodes.forEach((x,i)=>{if(x.st=='S'){let k=0;x.nb.forEach(j=>{if(s.nodes[j].st=='I'&&!s.blocked.has(key(i,j)))k++});if(k&&r()<1-Math.exp(-s.beta*k)){next[i]='E';ne++}}
+      else if(x.st=='E'&&r()<s.sigma)next[i]='I';else if(x.st=='I'&&r()<s.gamma)next[i]='R'});
+    s.nodes.forEach((x,i)=>x.st=next[i]);s.score();const c=s.count();s.hist.push({t:s.t,...c,snap:s.nodes.map(x=>x.st)});
+    if(ne)s.say(ne+' device(s) exposed; SEIR recalculated');return c};
+  s.rec=()=>{const out=[];s.nodes.forEach((x,i)=>{if(x.st=='X'||i==0)return;if(x.risk>.55||x.st=='I')out.push({idx:i,id:x.id,risk:x.risk,act:x.risk>.7||x.st=='I'?'Isolate':'Monitor',sev:x.risk>.8?'Critical':x.risk>.65?'High':'Medium',t:s.t})});return out.sort((a,b)=>b.risk-a.risk).slice(0,12)};
+  s.iso=i=>{s.nodes[i].st='X'};
+  s.R0=()=>{const d=s.nodes.reduce((a,x)=>a+x.nb.length,0)/s.nodes.length;return s.beta*d/s.gamma};
+  s.score();s.hist.push({t:0,...s.count(),snap:s.nodes.map(x=>x.st)});return s}
+
+// ---------- accounts (browser-local prototype) ----------
+const enc=async(p,salt)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+p)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+let reg=false,users={};try{users=JSON.parse(localStorage.getItem('csu')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('csu',JSON.stringify(users))}catch(e){}};
+$('sw').onclick=()=>{reg=!reg;$('regOnly').hidden=$('regOnly2').hidden=!reg;$('go').textContent=reg?'Create account':'Sign in';$('sw').textContent=reg?'Back to login':'Create account';$('er').textContent=''};
+$('sp').onchange=e=>{$('pw').type=$('pw2').type=e.target.checked?'text':'password'};
+$('go').onclick=async()=>{const e=$('em').value.trim().toLowerCase(),p=$('pw').value,er=$('er');
+  if(!/^\S+@\S+\.\S+$/.test(e))return er.textContent='Enter a valid email address.';
+  if(p.length<8)return er.textContent='Password needs at least 8 characters.';
+  if(reg){if(!$('nm').value.trim())return er.textContent='Enter your full name.';if(p!=$('pw2').value)return er.textContent='Passwords do not match.';
+    if(users[e])return er.textContent='That email is already registered. Sign in instead.';
+    const salt=crypto.getRandomValues(new Uint8Array(8)).join('');users[e]={name:$('nm').value.trim(),salt,h:await enc(p,salt)};save();enter(users[e].name,false)}
+  else{const u=users[e];if(!u||u.h!==await enc(p,u.salt))return er.textContent='Email or password is incorrect.';enter(u.name,false)}};
+$('demo').onclick=()=>enter('Judge (demo account)',true);
+$('out').onclick=()=>{if(confirm('Log out of CYBERSHIELD AI?')){pause();$('app').style.display='none';$('auth').style.display='grid'}};
+
+// ---------- background scene ----------
+(function(){const c=$('bgc'),R=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true}),S=new THREE.Scene(),C=new THREE.PerspectiveCamera(55,1,.1,100);C.position.z=22;
+  const pts=[...Array(40)].map(()=>new THREE.Vector3((Math.random()-.5)*34,(Math.random()-.5)*20,(Math.random()-.5)*14));
+  const g=new THREE.Group();pts.forEach(p=>{const m=new THREE.Mesh(new THREE.SphereGeometry(.18,10,10),new THREE.MeshBasicMaterial({color:0x21D4FD}));m.position.copy(p);g.add(m)});
+  const lp=[];pts.forEach((a,i)=>pts.forEach((b,j)=>{if(j>i&&a.distanceTo(b)<8)lp.push(a,b)}));g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp),new THREE.LineBasicMaterial({color:0x3478F6,transparent:true,opacity:.35})));S.add(g);
+  const sh=new THREE.Mesh(new THREE.IcosahedronGeometry(3,1),new THREE.MeshBasicMaterial({color:0x21D4FD,wireframe:true,transparent:true,opacity:.4}));sh.position.set(-9,2,0);S.add(sh);
+  function rs(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix()}rs();addEventListener('resize',rs);
+  (function a(){if($('auth').style.display!=='none'){g.rotation.y+=.0015;sh.rotation.y+=.004;sh.rotation.x+=.002;R.render(S,C)}requestAnimationFrame(a)})()})();
+
+// ---------- app ----------
+let sim=null,timer=null,running=false,sel=-1,pend=[],audit=[],runs=[],user='',scene,cam,ren,grp,meshes=[],lines,view=false,rot={x:.3,y:0},zoom=26;
+['Command','Simulation','AI Prediction','Defence','Analytics'].forEach((n,i)=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>tab(i);b.dataset.i=i;$('nav').appendChild(b)});
+function tab(i){[...$('nav').children].forEach((b,j)=>b.classList.toggle('on',j==i));for(let j=0;j<5;j++)$('p'+j).classList.toggle('on',j==i);draw()}
+function enter(name,demo){user=name;$('who').textContent=name;$('auth').style.display='none';$('app').style.display='grid';tab(0);if(!view)init3d();newSim();if(demo){$('sc').value='E';newSim();start();toast('Judge demo: scenario E runs automatically. Watch the 3D view, then approve recommendations in the Defence tab.')}}
+function toast(m){say(m)}
+function say(m){if(sim){sim.say(m);draw()}}
+function newSim(){pause();sim=Sim(+$('sd').value||1,Math.min(100,Math.max(30,+$('nd').value||60)),$('sc').value);pend=[];audit=[];build3d();syncTl();draw()}
+function start(){if(!sim||sim.t>0&&!running&&false)return;running=true;sim.say('Simulation started');loop()}
+function loop(){clearInterval(timer);timer=setInterval(()=>{tick()},+$('sp2').value)}
+function pause(){running=false;clearInterval(timer)}
+function tick(){const c=sim.step();sim.say('GNN prediction completed, risk scores updated');pend=sim.rec();if(pend.length)sim.say('Defence recommendation generated for '+pend[0].id);
+  if(c.I==0&&c.E==0){pause();sim.say('Simulation ended: no active infection');runs.push({seed:sim.seed,scn:sim.scn,t:sim.t,peak:Math.max(...sim.hist.map(h=>h.I)),iso:sim.count().X,rec:sim.count().R});}
+  syncTl();draw()}
+$('b1').onclick=()=>{newSim();start()};$('b2').onclick=()=>{if(running)pause();else start()};$('b3').onclick=()=>{pause();tick()};$('b4').onclick=newSim;
+$('sp2').onchange=()=>{if(running)loop()};
+function syncTl(){$('tl').max=sim.hist.length-1;$('tl').value=sim.hist.length-1}
+$('tl').oninput=()=>{pause();const h=sim.hist[+$('tl').value];sim.nodes.forEach((x,i)=>x.st=h.snap[i]);sim.t=h.t;sim.hist.length=+$('tl').value+1;sim.score();draw()};
+
+function toDefence(i,act){const x=sim.nodes[i];
+  if(act=='iso'){if(!confirm('Approve isolation of '+x.id+' inside the simulation?'))return;sim.iso(i);aud(x.id,'Isolation approved',true);sim.say('Device isolation approved: '+x.id)}
+  if(act=='rej'){if(!confirm('Reject the recommendation for '+x.id+'?'))return;aud(x.id,'Recommendation rejected',true)}
+  if(act=='rec'){if(!confirm('Mark '+x.id+' recovered?'))return;x.st='R';aud(x.id,'Recovery executed',true);sim.say('Device recovery completed: '+x.id)}
+  if(act=='blk'){const nb=x.nb.find(j=>sim.nodes[j].st=='I');if(nb==null)return alert('No infected neighbour link to block on this device.');sim.blocked.add(sim.key(i,nb));aud(x.id,'Blocked simulated link to '+sim.nodes[nb].id,true)}
+  sim.score();pend=sim.rec().filter(p=>p.idx!=i);draw()}
+function aud(id,a,ok){audit.unshift({t:sim.t,who:user,id,a,ok})}
+window.toDefence=toDefence;window.pickN=i=>{sel=i;draw();tab(0)};
+
+function draw(){if(!sim)return;const c=sim.count(),n=sim.nodes.length;
+  const k=[['Total devices',n],['Healthy',c.S],['Exposed',c.E],['Infected',c.I],['High-risk',sim.nodes.filter(x=>x.risk>.65).length],['Predicted at-risk',sim.nodes.filter(x=>x.st=='S'&&x.risk>.3).length]];
+  $('kp').innerHTML=k.map((a,i)=>`<div style="border-color:${['#3478F6','#25D995','#FFAA42','#FF4B5C','#FFAA42','#21D4FD'][i]}"><b>${a[1]}</b><small>${a[0]}</small></div>`).join('');
+  const hl=1-(c.I+c.E*.5)/n,lvl=c.I/n>.2?'Critical':c.I/n>.08?'High':c.I+c.E>0?'Elevated':'Low';
+  $('th').innerHTML=`Network health <b>${(hl*100).toFixed(0)}%</b> &middot; threat level <b>${lvl}</b> &middot; security score <b>${Math.round(hl*100-c.I)}</b><br>Propagation: ${running?'active, simulation running':sim.t?'paused or complete':'not started'}<br>Last step: t=${sim.t} ${sim.t?'('+new Date().toLocaleTimeString()+')':''}`;
+  $('ts').textContent=sim.t?'Step '+sim.t+' | seed '+sim.seed:'Ready';
+  $('lg').innerHTML=sim.log.slice(0,40).join('<br>');$('ev').innerHTML=sim.log.join('<br>');$('tlt').textContent='Step '+sim.t+' of '+(sim.hist.length-1);
+  const x=sim.nodes[sel];$('dv').innerHTML=x?`<b>${x.id}</b> (${x.type})<br>${x.ip} | ${SEGS[x.seg]}<br>State: ${NAME[x.st]} | risk ${(x.risk*100).toFixed(0)}% | confidence ${(x.conf*100).toFixed(0)}%<br>Reason: ${x.why}<br>Connected: ${x.nb.map(j=>sim.nodes[j].id).slice(0,8).join(', ')}`:'Click a device in the 3D view.';
+  $('sk').innerHTML=['S','E','I','R'].map(s=>`<div style="border-color:#${COL[s].toString(16).padStart(6,'0')}"><b>${c[s]}</b><small>${NAME[s]}</small></div>`).join('');
+  $('rr').innerHTML=`Basic reproduction estimate R0 = beta x mean degree / gamma = ${sim.beta} x ${(sim.nodes.reduce((a,x)=>a+x.nb.length,0)/n).toFixed(1)} / ${sim.gamma} = <b>${sim.R0().toFixed(1)}</b>. ${sim.R0()>1?'Above 1, so the threat grows without containment.':'Below 1, so the threat fades.'} Parameters are fixed model assumptions; connectivity comes from the generated graph.`;
+  const top=[...sim.nodes].sort((a,b)=>b.risk-a.risk).slice(0,8);
+  $('gt').innerHTML='<tr><th>Device</th><th>Risk</th><th>Conf.</th><th>Reason</th></tr>'+top.map(x=>`<tr><td>${x.id}</td><td>${(x.risk*100).toFixed(0)}% ${x.risk>.65?'High':x.risk>.35?'Med':'Low'}</td><td>${(x.conf*100).toFixed(0)}%</td><td>${x.why}</td></tr>`).join('');
+  $('rc').innerHTML=pend.length?pend.map(p=>`<div class="item"><b>${p.id}</b> <span class="tag">${p.sev}</span> risk ${(p.risk*100).toFixed(0)}% | detected t=${p.t}<br>Recommended: <b>${p.act}</b> (rule-based baseline: ${NAME[sim.nodes[p.idx].st]}, ${sim.nodes[p.idx].why})<div class="r"><button class="p" onclick="toDefence(${p.idx},'iso')">Approve isolation</button><button onclick="toDefence(${p.idx},'blk')">Block link</button><button onclick="toDefence(${p.idx},'rec')">Recover</button><button class="d" onclick="toDefence(${p.idx},'rej')">Reject</button><button onclick="pickN(${p.idx})">Details</button></div></div>`).join(''):'<div class="tip">No active recommendations. Start a simulation to generate them.</div>';
+  $('au').innerHTML='<tr><th>Step</th><th>By</th><th>Device</th><th>Action</th><th>OK</th></tr>'+audit.map(a=>`<tr><td>${a.t}</td><td>${a.who}</td><td>${a.id}</td><td>${a.a}</td><td>${a.ok?'Yes':'No'}</td></tr>`).join('');
+  $('hs').innerHTML='<tr><th>Scn</th><th>Seed</th><th>Steps</th><th>Peak I</th><th>Isolated</th><th>Recovered</th></tr>'+runs.map(r=>`<tr><td>${r.scn}</td><td>${r.seed}</td><td>${r.t}</td><td>${r.peak}</td><td>${r.iso}</td><td>${r.rec}</td></tr>`).join('');
+  chart($('c0'),sim.hist.map(h=>1-(h.I+h.E*.5)/sim.nodes.length),[[0x25D995]],1);chart($('c1'),sim.hist,['S','E','I','R'],sim.nodes.length);
+  paint3d()}
+function chart(cv,d,keys,max){const w=cv.width=cv.clientWidth*2||600,h=cv.height=300,g=cv.getContext('2d');g.clearRect(0,0,w,h);g.strokeStyle='#1b3355';for(let i=1;i<4;i++){g.beginPath();g.moveTo(0,h*i/4);g.lineTo(w,h*i/4);g.stroke()}
+  const L=d.length;if(L<2)return;const series=typeof keys[0]=='string'?keys.map(k=>[COL[k],d.map(p=>p[k]/max)]):[[keys[0][0],d]];
+  series.forEach(([c,v])=>{g.strokeStyle='#'+c.toString(16).padStart(6,'0');g.lineWidth=3;g.beginPath();v.forEach((y,i)=>{const px=i/(L-1)*w,py=h-6-y*(h-12);i?g.lineTo(px,py):g.moveTo(px,py)});g.stroke()})}
+
+// ---------- 3D network ----------
+function init3d(){view=true;const el=$('view');ren=new THREE.WebGLRenderer({antialias:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));el.prepend(ren.domElement);scene=new THREE.Scene();scene.fog=new THREE.Fog(0x050B16,25,70);cam=new THREE.PerspectiveCamera(50,1,.1,200);
+  scene.add(new THREE.AmbientLight(0xffffff,.7));const dl=new THREE.PointLight(0x21D4FD,1.2,80);dl.position.set(10,15,10);scene.add(dl);
+  function rs(){const w=el.clientWidth,h=el.clientHeight;ren.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}rs();addEventListener('resize',rs);
+  let dn=false,mv=0,lx,ly;const cv=ren.domElement;
+  cv.onpointerdown=e=>{dn=true;mv=0;lx=e.clientX;ly=e.clientY};addEventListener('pointerup',()=>dn=false);
+  cv.onpointermove=e=>{if(!dn)return;mv+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);rot.y+=(e.clientX-lx)*.006;rot.x+=(e.clientY-ly)*.006;lx=e.clientX;ly=e.clientY};
+  cv.onwheel=e=>{e.preventDefault();zoom=Math.min(60,Math.max(10,zoom+e.deltaY*.02))};
+  cv.onclick=e=>{if(mv>5)return;const b=cv.getBoundingClientRect(),m=new THREE.Vector2((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1),rc=new THREE.Raycaster();rc.setFromCamera(m,cam);const h=rc.intersectObjects(meshes.filter(x=>x.visible))[0];if(h){sel=h.object.userData.i;draw()}};
+  ['q','ft','fs'].forEach(i=>$(i).oninput=paint3d);
+  (function a(){if(grp){if(!dn)rot.y+=.0012;grp.rotation.y=rot.y;grp.rotation.x=rot.x;cam.position.set(0,0,zoom);cam.lookAt(0,0,0);ren.render(scene,cam)}requestAnimationFrame(a)})()}
+function build3d(){if(!scene)return;if(grp)scene.remove(grp);grp=new THREE.Group();meshes=[];
+  sim.nodes.forEach((x,i)=>{const geo=x.type=='Router'||x.type=='Gateway'?new THREE.OctahedronGeometry(.75):x.type=='Server'||x.type=='Database'?new THREE.BoxGeometry(.8,1.1,.8):new THREE.SphereGeometry(.45,14,14);
+    const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x25D995,emissive:0x25D995,emissiveIntensity:.5}));m.position.set(...x.pos);m.userData.i=i;grp.add(m);meshes.push(m)});
+  const p=[];sim.edges.forEach(([a,b])=>p.push(meshes[a].position,meshes[b].position));
+  lines=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(p),new THREE.LineBasicMaterial({color:0x3478F6,transparent:true,opacity:.28}));grp.add(lines);scene.add(grp)}
+function paint3d(){if(!grp||!sim)return;const q=$('q').value.trim().toLowerCase(),ft=$('ft').value,fs=$('fs').value;
+  const nbs=sel>=0?sim.nodes[sel].nb:[];
+  sim.nodes.forEach((x,i)=>{const m=meshes[i];if(!m)return;m.material.color.setHex(COL[x.st]);m.material.emissive.setHex(COL[x.st]);
+    m.visible=(!q||x.id.toLowerCase().includes(q))&&(!ft||x.type==ft)&&(!fs||x.st==fs);
+    m.scale.setScalar(i==sel?1.9:nbs.includes(i)?1.4:1);m.material.emissiveIntensity=x.st=='I'?.9:.45})}
+</script></body></html>
